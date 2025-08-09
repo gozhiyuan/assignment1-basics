@@ -2,7 +2,7 @@
 
 import math
 import os
-from einops import rearrange, einsum
+from einops import rearrange, einsum, reduce
 import einx
 from typing import Optional
 
@@ -117,9 +117,9 @@ class RMSNorm(nn.Module):
         x_f32 = x.to(torch.float32)
         
         # Compute RMSNorm in float32
-        rms = torch.rsqrt(torch.mean(x_f32 ** 2, dim=-1, keepdim=True) + self.eps)
+        rms = torch.rsqrt(torch.mean(x_f32 ** 2, dim=-1, keepdim=True) + self.eps)  # shape: (..., 1) e.g. [batch, seq, 1]
         output = x_f32 * rms * self.weight
-        
+
         # Return to original dtype
         return output.to(orig_dtype)
 
@@ -446,7 +446,7 @@ class MultiHeadAttention(nn.Module):
         
         # Concatenate heads and project back to d_model
         out = rearrange(attn, "b heads seq d_v -> b seq (heads d_v)")
-        return einsum(out, self.W_O, "... seq d_v, d_model d_v -> ... seq d_model")
+        return einsum(out, self.W_O, "... seq d_v, d_model d_v -> ... seq d_model")  # d_model = n_heads * d_v
     
 
 class TransformerBlock(nn.Module):
