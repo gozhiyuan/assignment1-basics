@@ -262,6 +262,14 @@ def softmax(
     
     # Normalize to get probabilities
     return exp_x / sum_exp_x
+
+def silu(x: Float[Tensor, " ..."]) -> Float[Tensor, " ..."]:
+    """
+    Apply the SiLU (Sigmoid Linear Unit) activation elementwise.
+
+    SiLU(x) = x * sigmoid(x)
+    """
+    return x * torch.sigmoid(x)
     
 def scaled_dot_product_attention(
         Q: Float[Tensor, "... n_queries d_k"],

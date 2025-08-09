@@ -254,7 +254,9 @@ def process_chunk_basic(chunk_text: str, special_tokens: List[str]) -> List[byte
             return [token.encode("utf-8") for token in PAT.findall(chunk_text)]
 
     # Handle special tokens
-    special_pattern = f"({'|'.join(map(re.escape, special_tokens))})"
+    # Sort by length (desc) to ensure longer, overlapping special tokens match first
+    sorted_special_tokens = sorted(special_tokens, key=len, reverse=True)
+    special_pattern = f"({'|'.join(map(re.escape, sorted_special_tokens))})"
     special_chunks = re.split(special_pattern, chunk_text)
 
     pre_tokens = []
@@ -288,7 +290,9 @@ def process_chunk_iter(chunk_text: str, special_tokens: List[str]) -> Iterator[b
         return
 
     # Handle special tokens
-    special_pattern = f"({'|'.join(map(re.escape, special_tokens))})"
+    # Sort by length (desc) to ensure longer, overlapping special tokens match first
+    sorted_special_tokens = sorted(special_tokens, key=len, reverse=True)
+    special_pattern = f"({'|'.join(map(re.escape, sorted_special_tokens))})"
     special_chunks = re.split(special_pattern, chunk_text)
 
     for chunk in special_chunks:
